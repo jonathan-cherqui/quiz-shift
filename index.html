@@ -1,1164 +1,378 @@
-<!--
-  ╔══════════════════════════════════════════════════════════════════╗
-  ║  QUIZ SHIFT IDENTITAIRE · Clémentine Roy                        ║
-  ║  Version iframe — à héberger sur un serveur                     ║
-  ╠══════════════════════════════════════════════════════════════════╣
-  ║  HÉBERGEMENT : uploader ce fichier sur votre serveur            ║
-  ║  ex : clementinedoula.com/quiz-iframe/index.html                ║
-  ║                                                                  ║
-  ║  INTÉGRATION WORDPRESS / ELEMENTOR :                            ║
-  ║  1. Widget HTML dans Elementor                                   ║
-  ║  2. Coller ce code :                                             ║
-  ║                                                                  ║
-  ║  <iframe                                                         ║
-  ║    id="quiz-shift"                                               ║
-  ║    src="https://VOTRE-URL/quiz-iframe/index.html"                ║
-  ║    width="100%"                                                  ║
-  ║    height="800"                                                  ║
-  ║    frameborder="0"                                               ║
-  ║    scrolling="no"                                                ║
-  ║    style="border:none;overflow:hidden;">                         ║
-  ║  </iframe>                                                       ║
-  ║  <script>                                                        ║
-  ║  window.addEventListener('message', function(e) {               ║
-  ║    if (e.data && e.data.type === 'quizHeight') {                 ║
-  ║      document.getElementById('quiz-shift').style.height          ║
-  ║        = e.data.height + 'px';                                   ║
-  ║    }                                                             ║
-  ║  });                                                             ║
-  ║  </script>                                                       ║
-  ║                                                                  ║
-  ║  BREVO : remplacer COLLE_TA_CLE_API_BREVO_ICI par ta clé        ║
-  ╚══════════════════════════════════════════════════════════════════╝
--->
 <!DOCTYPE html>
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Quiz Shift Identitaire · Clémentine Roy</title>
-<!-- Polices système embarquées — pas de dépendance externe -->
 <style>
-  html { background-color: #FAF6F0; min-height: 100%; }
-  :root {
-    --cream: #FAF6F0;
-    --warm-white: #FFF9F3;
-    --terracotta: #C4714A;
-    --terracotta-light: #E8916B;
-    --terracotta-dark: #A05535;
-    --sage: #7A8C6E;
-    --deep: #2C2218;
-    --muted: #8A7A6E;
-    --border: #E8DDD4;
-    --gold: #C9A84C;
-  }
-
-  * { box-sizing: border-box; margin: 0; padding: 0; }
-
-  body {
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
-    background: var(--cream);
-    color: var(--deep);
-    min-height: 100%;
-    overflow-x: hidden;
-    /* iframe-friendly: auto height */
-  }
-  html { height: auto; }
-
-  /* Noise texture removed for iframe compatibility */
-
-  .container {
-    max-width: 680px;
-    margin: 0 auto;
-    padding: 0 24px 80px;
-    position: relative;
-    z-index: 1;
-  }
-
-  /* HEADER */
-  .header {
-    text-align: center;
-    padding: 60px 0 40px;
-  }
-
-  .header-eyebrow {
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
-    font-size: 11px;
-    letter-spacing: 3px;
-    text-transform: uppercase;
-    color: var(--terracotta);
-    margin-bottom: 20px;
-    font-weight: 500;
-  }
-
-  .header h1 {
-    font-family: Georgia, 'Times New Roman', serif;
-    font-size: clamp(28px, 5vw, 42px);
-    line-height: 1.2;
-    color: var(--deep);
-    margin-bottom: 16px;
-  }
-
-  .header h1 em {
-    color: var(--terracotta);
-    font-style: italic;
-  }
-
-  .header-sub {
-    font-size: 16px;
-    color: var(--muted);
-    line-height: 1.6;
-    max-width: 500px;
-    margin: 0 auto;
-  }
-
-  .divider {
-    width: 60px;
-    height: 2px;
-    background: var(--terracotta);
-    margin: 28px auto;
-    opacity: 0.5;
-  }
-
-  /* PROGRESS BAR */
-  .progress-wrap {
-    margin-bottom: 40px;
-  }
-
-  .progress-info {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 10px;
-  }
-
-  .progress-label {
-    font-size: 12px;
-    color: var(--muted);
-    letter-spacing: 1px;
-    text-transform: uppercase;
-  }
-
-  .progress-count {
-    font-family: Georgia, 'Times New Roman', serif;
-    font-size: 14px;
-    color: var(--terracotta);
-  }
-
-  .progress-bar {
-    height: 3px;
-    background: var(--border);
-    border-radius: 2px;
-    overflow: hidden;
-  }
-
-  .progress-fill {
-    height: 100%;
-    background: linear-gradient(90deg, var(--terracotta), var(--gold));
-    border-radius: 2px;
-    transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
-  }
-
-  /* QUESTION CARD */
-  .question-card {
-    background: var(--warm-white);
-    border: 1px solid var(--border);
-    border-radius: 16px;
-    padding: 40px;
-    margin-bottom: 24px;
-    animation: slideIn 0.4s ease;
-  }
-
-  @keyframes slideIn {
-    from { opacity: 0; transform: translateY(16px); }
-    to { opacity: 1; transform: translateY(0); }
-  }
-
-  .question-number {
-    font-size: 11px;
-    letter-spacing: 2px;
-    text-transform: uppercase;
-    color: var(--terracotta);
-    font-weight: 500;
-    margin-bottom: 14px;
-  }
-
-  .question-text {
-    font-family: Georgia, 'Times New Roman', serif;
-    font-size: clamp(18px, 3vw, 22px);
-    line-height: 1.4;
-    color: var(--deep);
-    margin-bottom: 32px;
-  }
-
-  /* OPTIONS */
-  .options {
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-  }
-
-  .option {
-    display: flex;
-    align-items: flex-start;
-    gap: 14px;
-    padding: 18px 20px;
-    border: 1.5px solid var(--border);
-    border-radius: 10px;
-    cursor: pointer;
-    transition: all 0.2s ease;
-    background: transparent;
-    text-align: left;
-    width: 100%;
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
-  }
-
-  .option:hover {
-    border-color: var(--terracotta-light);
-    background: rgba(196, 113, 74, 0.04);
-    transform: translateX(4px);
-  }
-
-  .option.selected {
-    border-color: var(--terracotta);
-    background: rgba(196, 113, 74, 0.08);
-  }
-
-  .option-dot {
-    width: 20px;
-    height: 20px;
-    border-radius: 50%;
-    border: 2px solid var(--border);
-    flex-shrink: 0;
-    margin-top: 2px;
-    transition: all 0.2s;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
-
-  .option.selected .option-dot {
-    border-color: var(--terracotta);
-    background: var(--terracotta);
-  }
-
-  .option.selected .option-dot::after {
-    content: '';
-    width: 8px;
-    height: 8px;
-    border-radius: 50%;
-    background: white;
-  }
-
-  .option-text {
-    font-size: 15px;
-    line-height: 1.5;
-    color: var(--deep);
-    font-weight: 300;
-  }
-
-  /* NAVIGATION */
-  .nav {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-top: 8px;
-  }
-
-  .btn-back {
-    background: transparent;
-    border: none;
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
-    font-size: 14px;
-    color: var(--muted);
-    cursor: pointer;
-    padding: 12px 0;
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    transition: color 0.2s;
-  }
-
-  .btn-back:hover { color: var(--deep); }
-
-  .btn-next {
-    background: var(--terracotta);
-    color: white;
-    border: none;
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
-    font-size: 15px;
-    font-weight: 500;
-    padding: 14px 32px;
-    border-radius: 8px;
-    cursor: pointer;
-    transition: all 0.2s ease;
-    letter-spacing: 0.3px;
-  }
-
-  .btn-next:hover {
-    background: var(--terracotta-dark);
-    transform: translateY(-1px);
-    box-shadow: 0 6px 20px rgba(196, 113, 74, 0.3);
-  }
-
-  .btn-next:disabled {
-    opacity: 0.4;
-    cursor: not-allowed;
-    transform: none;
-    box-shadow: none;
-  }
-
-  /* EMAIL CAPTURE */
-  .email-card {
-    background: var(--warm-white);
-    border: 1px solid var(--border);
-    border-radius: 16px;
-    padding: 48px 40px;
-    text-align: center;
-    animation: slideIn 0.4s ease;
-  }
-
-  .email-card .icon {
-    font-size: 40px;
-    margin-bottom: 20px;
-  }
-
-  .email-card h2 {
-    font-family: Georgia, 'Times New Roman', serif;
-    font-size: 26px;
-    margin-bottom: 12px;
-    color: var(--deep);
-  }
-
-  .email-card p {
-    color: var(--muted);
-    font-size: 15px;
-    line-height: 1.6;
-    margin-bottom: 32px;
-    max-width: 420px;
-    margin-left: auto;
-    margin-right: auto;
-  }
-
-  .email-card p:last-of-type { margin-bottom: 32px; }
-
-  .field-group {
-    display: flex;
-    flex-direction: column;
-    gap: 14px;
-    margin-bottom: 24px;
-  }
-
-  .field-group input {
-    width: 100%;
-    padding: 16px 20px;
-    border: 1.5px solid var(--border);
-    border-radius: 8px;
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
-    font-size: 15px;
-    color: var(--deep);
-    background: white;
-    transition: border-color 0.2s;
-    outline: none;
-  }
-
-  .field-group input:focus {
-    border-color: var(--terracotta);
-  }
-
-  .field-group input::placeholder {
-    color: #BDB0A6;
-  }
-
-  .btn-submit {
-    width: 100%;
-    background: var(--terracotta);
-    color: white;
-    border: none;
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
-    font-size: 16px;
-    font-weight: 500;
-    padding: 18px;
-    border-radius: 8px;
-    cursor: pointer;
-    transition: all 0.2s ease;
-    letter-spacing: 0.3px;
-  }
-
-  .btn-submit:hover {
-    background: var(--terracotta-dark);
-    box-shadow: 0 8px 24px rgba(196, 113, 74, 0.35);
-    transform: translateY(-1px);
-  }
-
-  .privacy-note {
-    font-size: 12px;
-    color: var(--muted);
-    margin-top: 16px;
-    opacity: 0.7;
-  }
-
-  /* RGPD */
-  .rgpd-label {
-    display: flex;
-    align-items: flex-start;
-    gap: 12px;
-    text-align: left;
-    cursor: pointer;
-    margin-bottom: 20px;
-    padding: 16px;
-    border: 1.5px solid var(--border);
-    border-radius: 8px;
-    background: var(--cream);
-    transition: border-color 0.2s;
-  }
-  .rgpd-label:hover { border-color: var(--terracotta-light); }
-  .rgpd-label.checked { border-color: var(--terracotta); background: rgba(196,113,74,0.04); }
-  .rgpd-label input[type="checkbox"] { position: absolute; opacity: 0; width: 0; height: 0; }
-  .rgpd-box {
-    flex-shrink: 0;
-    width: 20px;
-    height: 20px;
-    border: 2px solid var(--border);
-    border-radius: 4px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin-top: 1px;
-    transition: all 0.2s;
-    background: white;
-  }
-  .rgpd-box svg { opacity: 0; transition: opacity 0.15s; }
-  .rgpd-label.checked .rgpd-box { background: var(--terracotta); border-color: var(--terracotta); }
-  .rgpd-label.checked .rgpd-box svg { opacity: 1; }
-  .rgpd-text { font-size: 13px; color: var(--muted); line-height: 1.5; }
-  .rgpd-text a { color: var(--terracotta); text-decoration: underline; }
-
-  /* RESULT */
-  .result-card {
-    animation: slideIn 0.5s ease;
-  }
-
-  .result-hero {
-    background: var(--warm-white);
-    border: 1px solid var(--border);
-    border-radius: 16px;
-    padding: 48px 40px;
-    text-align: center;
-    margin-bottom: 20px;
-  }
-
-  .result-profile-badge {
-    display: inline-block;
-    background: rgba(196, 113, 74, 0.1);
-    color: var(--terracotta);
-    font-size: 11px;
-    letter-spacing: 3px;
-    text-transform: uppercase;
-    padding: 8px 20px;
-    border-radius: 100px;
-    font-weight: 500;
-    margin-bottom: 24px;
-  }
-
-  .result-hero h2 {
-    font-family: Georgia, 'Times New Roman', serif;
-    font-size: clamp(24px, 4vw, 34px);
-    line-height: 1.2;
-    color: var(--deep);
-    margin-bottom: 6px;
-  }
-
-  .result-hero h2 em {
-    color: var(--terracotta);
-    font-style: italic;
-  }
-
-  .result-tagline {
-    font-size: 16px;
-    color: var(--muted);
-    margin-bottom: 28px;
-    font-style: italic;
-  }
-
-  .result-divider {
-    width: 40px;
-    height: 2px;
-    background: var(--terracotta);
-    margin: 0 auto 28px;
-    opacity: 0.4;
-  }
-
-  .result-description {
-    font-size: 16px;
-    line-height: 1.8;
-    color: var(--deep);
-    text-align: left;
-    margin-bottom: 32px;
-  }
-
-  .result-section {
-    background: var(--warm-white);
-    border: 1px solid var(--border);
-    border-radius: 12px;
-    padding: 28px;
-    margin-bottom: 16px;
-  }
-
-  .result-section h3 {
-    font-family: Georgia, 'Times New Roman', serif;
-    font-size: 17px;
-    color: var(--deep);
-    margin-bottom: 14px;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-  }
-
-  .result-section ul {
-    list-style: none;
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-  }
-
-  .result-section li {
-    font-size: 14px;
-    color: var(--deep);
-    padding-left: 20px;
-    position: relative;
-    line-height: 1.5;
-  }
-
-  .result-section li::before {
-    content: '→';
-    position: absolute;
-    left: 0;
-    color: var(--terracotta);
-    font-size: 12px;
-    top: 2px;
-  }
-
-  .cta-box {
-    background: linear-gradient(135deg, var(--terracotta) 0%, var(--terracotta-dark) 100%);
-    border-radius: 16px;
-    padding: 40px;
-    text-align: center;
-    color: white;
-    margin-top: 20px;
-  }
-
-  .cta-box h3 {
-    font-family: Georgia, 'Times New Roman', serif;
-    font-size: 22px;
-    margin-bottom: 12px;
-  }
-
-  .cta-box p {
-    font-size: 15px;
-    opacity: 0.85;
-    line-height: 1.6;
-    margin-bottom: 24px;
-    max-width: 400px;
-    margin-left: auto;
-    margin-right: auto;
-  }
-
-  .btn-cta {
-    display: inline-block;
-    background: white;
-    color: var(--terracotta-dark);
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
-    font-size: 15px;
-    font-weight: 600;
-    padding: 16px 36px;
-    border-radius: 8px;
-    text-decoration: none;
-    transition: all 0.2s;
-    letter-spacing: 0.3px;
-    cursor: pointer;
-    border: none;
-  }
-
-  .btn-cta:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 8px 24px rgba(0,0,0,0.2);
-  }
-
-  /* START SCREEN */
-  .start-card {
-    background: var(--warm-white);
-    border: 1px solid var(--border);
-    border-radius: 16px;
-    padding: 48px 40px;
-    text-align: center;
-    animation: slideIn 0.4s ease;
-  }
-
-  .start-meta {
-    display: flex;
-    justify-content: center;
-    gap: 24px;
-    margin: 24px 0 32px;
-  }
-
-  .meta-item {
-    font-size: 13px;
-    color: var(--muted);
-    display: flex;
-    align-items: center;
-    gap: 6px;
-  }
-
-  .btn-start {
-    background: var(--terracotta);
-    color: white;
-    border: none;
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
-    font-size: 16px;
-    font-weight: 500;
-    padding: 18px 48px;
-    border-radius: 8px;
-    cursor: pointer;
-    transition: all 0.2s ease;
-  }
-
-  .btn-start:hover {
-    background: var(--terracotta-dark);
-    transform: translateY(-2px);
-    box-shadow: 0 8px 24px rgba(196, 113, 74, 0.35);
-  }
-
-  .footer-sig {
-    text-align: center;
-    padding-top: 40px;
-    font-size: 13px;
-    color: var(--muted);
-  }
-
-  .footer-sig span {
-    font-family: Georgia, 'Times New Roman', serif;
-    font-style: italic;
-    color: var(--terracotta);
-  }
-
-  .hidden { display: none; }
-
-  @media (max-width: 500px) {
-    .question-card, .email-card, .result-hero, .start-card { padding: 28px 20px; }
-    .cta-box { padding: 28px 20px; }
-    .result-section { padding: 20px; }
-  }
+:root {
+  --cream: #FAF6F0; --warm-white: #FFF9F3;
+  --terra: #C4714A; --terra-light: #E8916B; --terra-dark: #A05535;
+  --deep: #2C2218; --muted: #8A7A6E; --border: #E8DDD4;
+  --gold: #C9A84C;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html { background: var(--cream); }
+body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: var(--cream); color: var(--deep); min-height: 100vh; }
+.container { max-width: 660px; margin: 0 auto; padding: 0 20px 80px; }
+.header { text-align: center; padding: 52px 0 36px; }
+.header-eyebrow { font-size: 11px; letter-spacing: 3px; text-transform: uppercase; color: var(--terra); margin-bottom: 18px; font-weight: 600; }
+.header h1 { font-family: Georgia, serif; font-size: clamp(26px, 5vw, 40px); font-weight: 400; line-height: 1.2; margin-bottom: 14px; }
+.header h1 em { color: var(--terra); font-style: italic; }
+.header-sub { font-size: 15px; color: var(--muted); line-height: 1.6; max-width: 480px; margin: 0 auto; }
+.divider { width: 48px; height: 2px; background: var(--terra); margin: 22px auto; opacity: .5; }
+.screen { display: none; }
+.screen.active { display: block; }
+.card { background: var(--warm-white); border: 1px solid var(--border); border-radius: 14px; padding: 36px; margin-bottom: 20px; }
+.start-meta { display: flex; justify-content: center; gap: 20px; margin: 20px 0 28px; flex-wrap: wrap; }
+.meta-item { font-size: 13px; color: var(--muted); }
+.progress-wrap { margin-bottom: 32px; }
+.progress-info { display: flex; justify-content: space-between; margin-bottom: 8px; }
+.progress-label { font-size: 11px; color: var(--muted); letter-spacing: 1px; text-transform: uppercase; }
+.progress-count { font-family: Georgia, serif; font-size: 13px; color: var(--terra); }
+.progress-bar { height: 3px; background: var(--border); border-radius: 2px; overflow: hidden; }
+.progress-fill { height: 100%; background: linear-gradient(90deg, var(--terra), var(--gold)); border-radius: 2px; transition: width .4s ease; }
+.question-number { font-size: 11px; letter-spacing: 2px; text-transform: uppercase; color: var(--terra); font-weight: 600; margin-bottom: 12px; }
+.question-text { font-family: Georgia, serif; font-size: clamp(17px, 3vw, 21px); line-height: 1.4; margin-bottom: 28px; }
+.options { display: flex; flex-direction: column; gap: 10px; }
+.option { display: flex; align-items: flex-start; gap: 12px; padding: 16px 18px; border: 1.5px solid var(--border); border-radius: 9px; cursor: pointer; background: transparent; text-align: left; width: 100%; font-family: inherit; font-size: 15px; color: var(--deep); line-height: 1.5; transition: border-color .15s, background .15s, transform .15s; }
+.option:hover { border-color: var(--terra-light); background: rgba(196,113,74,.04); transform: translateX(3px); }
+.option.selected { border-color: var(--terra); background: rgba(196,113,74,.07); }
+.option-dot { width: 18px; height: 18px; border-radius: 50%; border: 2px solid var(--border); flex-shrink: 0; margin-top: 2px; transition: all .15s; display: flex; align-items: center; justify-content: center; pointer-events: none; }
+.option.selected .option-dot { border-color: var(--terra); background: var(--terra); }
+.option.selected .option-dot::after { content: ''; width: 7px; height: 7px; border-radius: 50%; background: white; }
+.option-text { pointer-events: none; font-weight: 300; }
+.nav { display: flex; justify-content: space-between; align-items: center; margin-top: 8px; }
+.btn { font-family: inherit; font-size: 15px; font-weight: 500; padding: 13px 28px; border-radius: 8px; border: none; cursor: pointer; transition: all .2s; letter-spacing: .2px; }
+.btn-primary { background: var(--terra); color: white; }
+.btn-primary:hover:not(:disabled) { background: var(--terra-dark); transform: translateY(-1px); box-shadow: 0 5px 18px rgba(196,113,74,.3); }
+.btn-primary:disabled { opacity: .4; cursor: not-allowed; transform: none !important; box-shadow: none !important; }
+.btn-ghost { background: transparent; color: var(--muted); font-size: 14px; padding: 12px 0; }
+.btn-ghost:hover { color: var(--deep); }
+.btn-ghost.invisible { visibility: hidden; }
+.btn-large { font-size: 16px; padding: 16px 40px; }
+.btn-full { width: 100%; }
+.email-icon { font-size: 38px; text-align: center; margin-bottom: 18px; }
+.email-card h2 { font-family: Georgia, serif; font-size: 24px; font-weight: 400; text-align: center; margin-bottom: 10px; }
+.email-card > p { color: var(--muted); font-size: 15px; line-height: 1.6; text-align: center; margin-bottom: 24px; }
+.field-group { display: flex; flex-direction: column; gap: 12px; margin-bottom: 20px; }
+.field-group input { width: 100%; padding: 14px 18px; border: 1.5px solid var(--border); border-radius: 8px; font-family: inherit; font-size: 15px; color: var(--deep); background: white; outline: none; transition: border-color .2s; }
+.field-group input:focus { border-color: var(--terra); }
+.field-group input::placeholder { color: #C0B4AA; }
+.rgpd-label { display: flex; align-items: flex-start; gap: 11px; cursor: pointer; margin-bottom: 20px; padding: 14px; border: 1.5px solid var(--border); border-radius: 8px; background: var(--cream); transition: border-color .2s; }
+.rgpd-label:hover { border-color: var(--terra-light); }
+.rgpd-label.checked { border-color: var(--terra); background: rgba(196,113,74,.04); }
+.rgpd-checkbox-input { position: absolute; opacity: 0; width: 0; height: 0; }
+.rgpd-box { flex-shrink: 0; width: 19px; height: 19px; border: 2px solid var(--border); border-radius: 4px; display: flex; align-items: center; justify-content: center; margin-top: 1px; transition: all .15s; background: white; }
+.rgpd-label.checked .rgpd-box { background: var(--terra); border-color: var(--terra); }
+.rgpd-checkmark { opacity: 0; transition: opacity .15s; }
+.rgpd-label.checked .rgpd-checkmark { opacity: 1; }
+.rgpd-text { font-size: 12px; color: var(--muted); line-height: 1.5; }
+.rgpd-text a { color: var(--terra); }
+.privacy-note { font-size: 11px; color: var(--muted); text-align: center; margin-top: 14px; opacity: .7; }
+.result-hero { text-align: center; }
+.profile-badge { display: inline-block; background: rgba(196,113,74,.1); color: var(--terra); font-size: 10px; letter-spacing: 3px; text-transform: uppercase; padding: 7px 18px; border-radius: 100px; font-weight: 600; margin-bottom: 20px; }
+.result-hero h2 { font-family: Georgia, serif; font-size: clamp(22px, 4vw, 32px); font-weight: 400; line-height: 1.2; margin-bottom: 6px; }
+.result-hero h2 em { color: var(--terra); font-style: italic; }
+.result-tagline { font-size: 15px; color: var(--muted); margin-bottom: 24px; font-style: italic; }
+.result-divider { width: 36px; height: 2px; background: var(--terra); margin: 0 auto 24px; opacity: .4; }
+.result-desc { font-size: 15px; line-height: 1.8; text-align: left; }
+.result-desc p { margin-bottom: 14px; }
+.result-section { background: var(--warm-white); border: 1px solid var(--border); border-radius: 11px; padding: 24px; margin-bottom: 14px; }
+.result-section h3 { font-family: Georgia, serif; font-size: 16px; font-weight: 400; margin-bottom: 14px; }
+.result-section ul { list-style: none; display: flex; flex-direction: column; gap: 9px; }
+.result-section li { font-size: 14px; padding-left: 18px; position: relative; line-height: 1.5; }
+.result-section li::before { content: '→'; position: absolute; left: 0; color: var(--terra); font-size: 11px; top: 3px; }
+.cta-box { background: linear-gradient(135deg, var(--terra), var(--terra-dark)); border-radius: 14px; padding: 36px; text-align: center; color: white; margin-top: 18px; }
+.cta-box h3 { font-family: Georgia, serif; font-size: 20px; font-weight: 400; margin-bottom: 10px; }
+.cta-box p { font-size: 14px; opacity: .85; line-height: 1.6; margin-bottom: 22px; max-width: 380px; margin-left: auto; margin-right: auto; }
+.btn-cta { display: inline-block; background: white; color: var(--terra-dark); font-family: inherit; font-size: 14px; font-weight: 600; padding: 14px 32px; border-radius: 8px; text-decoration: none; transition: all .2s; }
+.btn-cta:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(0,0,0,.18); }
+.confirm-msg { text-align: center; margin-top: 14px; font-size: 12px; color: var(--muted); }
+.footer-sig { text-align: center; padding-top: 36px; font-size: 12px; color: var(--muted); }
+.footer-sig span { font-family: Georgia, serif; font-style: italic; color: var(--terra); }
+@media (max-width: 480px) { .card { padding: 24px 18px; } .cta-box { padding: 28px 18px; } }
 </style>
 </head>
-<body style="margin:0;padding:0;background-color:#FAF6F0;">
-<div id="quiz-debug" style="position:fixed;top:0;left:0;right:0;background:#C4714A;color:white;font-family:sans-serif;font-size:13px;padding:8px 16px;text-align:center;z-index:99999;">⏳ Chargement du quiz...</div>
-
-
+<body>
 <div class="container">
 
-  <!-- HEADER -->
   <div class="header">
-    <div class="header-eyebrow">Clémentine · Coach pour mères en shift identitaire</div>
-    <h1>Où en es-tu dans ton<br><em>shift identitaire</em> ?</h1>
+    <div class="header-eyebrow">Clémentine Roy · Coach shift identitaire</div>
+    <h1>Où en es-tu dans ton<br><em>shift identitaire ?</em></h1>
     <div class="divider"></div>
-    <p class="header-sub">Découvre ton profil et les prochaines étapes pour retrouver ta place de femme — sans tout faire exploser.</p>
+    <p class="header-sub">Découvre ton profil et les premières étapes pour retrouver ta place de femme — sans tout faire exploser.</p>
   </div>
 
-  <!-- MAIN CONTENT -->
-  <div id="app">
-
-    <!-- START -->
-    <div id="screen-start" class="start-card">
-      <div style="font-size: 48px; margin-bottom: 20px;">🌸</div>
-      <h2 style="font-family: Georgia, 'Times New Roman', serif; font-size: 22px; margin-bottom: 10px;">7 questions pour révéler où tu en es</h2>
-      <p style="color: var(--muted); font-size: 15px; line-height: 1.6; margin-bottom: 8px;">Pas de bonnes ou mauvaises réponses. Juste la vérité sur ce que tu vis en ce moment.</p>
+  <!-- START -->
+  <div id="screen-start" class="screen active">
+    <div class="card" style="text-align:center">
+      <div style="font-size:44px;margin-bottom:18px">🌸</div>
+      <h2 style="font-family:Georgia,serif;font-size:21px;font-weight:400;margin-bottom:10px">7 questions pour révéler où tu en es</h2>
+      <p style="color:var(--muted);font-size:15px;line-height:1.6;margin-bottom:6px">Pas de bonnes ou mauvaises réponses. Juste la vérité sur ce que tu vis.</p>
       <div class="start-meta">
         <span class="meta-item">⏱ 3 minutes</span>
         <span class="meta-item">✨ Résultat personnalisé</span>
         <span class="meta-item">🎁 PDF offert</span>
       </div>
-      <button class="btn-start">Commencer le quiz →</button>
+      <button id="btn-start" class="btn btn-primary btn-large">Commencer le quiz →</button>
     </div>
+  </div>
 
-    <!-- QUIZ -->
-    <div id="screen-quiz" class="hidden">
-      <div class="progress-wrap">
-        <div class="progress-info">
-          <span class="progress-label">Progression</span>
-          <span class="progress-count" id="progress-count">1 / 7</span>
-        </div>
-        <div class="progress-bar">
-          <div class="progress-fill" id="progress-fill" style="width: 14%"></div>
-        </div>
+  <!-- QUIZ -->
+  <div id="screen-quiz" class="screen">
+    <div class="progress-wrap">
+      <div class="progress-info">
+        <span class="progress-label">Progression</span>
+        <span class="progress-count" id="progress-count">1 / 7</span>
       </div>
-      <div id="question-container"></div>
-      <div class="nav">
-        <button class="btn-back" id="btn-back">← Précédent</button>
-        <button class="btn-next" id="btn-next" disabled>Continuer →</button>
-      </div>
+      <div class="progress-bar"><div class="progress-fill" id="progress-fill" style="width:14%"></div></div>
     </div>
+    <div class="card">
+      <div class="question-number" id="question-number">Question 1 sur 7</div>
+      <div class="question-text" id="question-text"></div>
+      <div class="options" id="options-container"></div>
+    </div>
+    <div class="nav">
+      <button id="btn-back" class="btn btn-ghost invisible">← Précédent</button>
+      <button id="btn-next" class="btn btn-primary" disabled>Continuer →</button>
+    </div>
+  </div>
 
-    <!-- EMAIL CAPTURE -->
-    <div id="screen-email" class="hidden email-card">
-      <div class="icon">💌</div>
+  <!-- EMAIL -->
+  <div id="screen-email" class="screen">
+    <div class="card email-card">
+      <div class="email-icon">💌</div>
       <h2>Ton profil est prêt !</h2>
-      <p>Entre ton prénom et ton email pour recevoir ton résultat personnalisé <strong>et ton PDF cadeau</strong> avec les premières étapes pour avancer.</p>
+      <p>Entre ton prénom et ton email pour recevoir ton résultat <strong>et ton PDF cadeau</strong>.</p>
       <div class="field-group">
-        <input type="text" id="input-name" placeholder="Ton prénom" />
-        <input type="email" id="input-email" placeholder="Ton adresse email" />
+        <input type="text" id="input-name" placeholder="Ton prénom" autocomplete="given-name">
+        <input type="email" id="input-email" placeholder="Ton adresse email" autocomplete="email">
       </div>
-
-      <!-- RGPD CONSENT -->
       <label class="rgpd-label" id="rgpd-label">
-        <input type="checkbox" id="rgpd-checkbox" />
-        <span class="rgpd-box" id="rgpd-box">
-          <svg width="11" height="9" viewBox="0 0 11 9" fill="none"><path d="M1 4L4 7.5L10 1" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        <input type="checkbox" id="rgpd-checkbox" class="rgpd-checkbox-input">
+        <span class="rgpd-box">
+          <svg class="rgpd-checkmark" width="11" height="9" viewBox="0 0 11 9" fill="none">
+            <path d="M1 4L4 7.5L10 1" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
         </span>
         <span class="rgpd-text">
-          J'accepte de recevoir des communications de Clémentine Roy (résultats du quiz, conseils, offres de coaching) conformément à la <a href="https://clementinedoula.com/politique-de-confidentialite/" target="_blank">politique de confidentialité</a>. Je peux me désinscrire à tout moment.
+          J'accepte de recevoir des communications de Clémentine Roy conformément à la
+          <a href="https://clementinedoula.com/politique-de-confidentialite/" target="_blank">politique de confidentialité</a>.
+          Je peux me désinscrire à tout moment.
         </span>
       </label>
-
-      <button class="btn-submit" id="btn-submit" disabled>Voir mon profil →</button>
-
-      <p class="privacy-note">🔒 Données hébergées en France · Aucune revente à des tiers · Conformité RGPD</p>
+      <button id="btn-submit" class="btn btn-primary btn-full" disabled>Voir mon profil →</button>
+      <p class="privacy-note">🔒 Données hébergées en France · Aucune revente · Conformité RGPD</p>
     </div>
+  </div>
 
-    <!-- RESULT -->
-    <div id="screen-result" class="hidden result-card"></div>
-
+  <!-- RESULT -->
+  <div id="screen-result" class="screen">
+    <div class="card result-hero" id="result-hero"></div>
+    <div class="result-section" id="result-signes"></div>
+    <div class="result-section" id="result-prochaines"></div>
+    <div class="cta-box">
+      <h3>Prête à passer au niveau suivant ?</h3>
+      <p>Rejoins la masterclass gratuite <strong>Le Réveil des Mères Audacieuses</strong> — le premier pas concret vers la vie qui te ressemble.</p>
+      <a href="https://clementinedoula.com/live-reveildesmeresaudacieuses/" class="btn-cta" target="_blank">Je rejoins la masterclass gratuite →</a>
+    </div>
+    <div class="confirm-msg" id="confirm-msg"></div>
   </div>
 
   <div class="footer-sig">Un quiz créé par <span>Clémentine Roy</span> · Coach pour mères en shift identitaire</div>
 </div>
 
 <script>
-const questions = [
-  {
-    text: "Le soir, quand les enfants sont couchés, tu ressens plutôt…",
-    options: [
-      { text: "Un vague malaise, une sensation que la journée est passée sans que tu y sois vraiment", score: [3, 1, 0] },
-      { text: "Du soulagement, et parfois une pensée furtive : « c'est ça ma vie maintenant ? »", score: [1, 3, 0] },
-      { text: "De l'épuisement mais aussi une certaine culpabilité de ne pas être plus heureuse", score: [0, 2, 3] },
-      { text: "Un mélange d'agacement et d'envie d'autre chose, sans savoir quoi exactement", score: [2, 1, 2] }
-    ]
-  },
-  {
-    text: "Face à tes désirs profonds (envie de changer de job, de voyager, de créer quelque chose…), tu…",
-    options: [
-      { text: "Les tais. Tu les trouves inconvenants ou ingrats vu ta « belle vie »", score: [3, 1, 0] },
-      { text: "Les identifies mais tu ne sais pas par où commencer pour leur faire de la place", score: [1, 3, 0] },
-      { text: "Les exprimes à voix haute mais tu te sens bloquée par la peur de déranger", score: [0, 2, 3] },
-      { text: "Tu alternes entre enthousiasme et paralysie", score: [2, 2, 1] }
-    ]
-  },
-  {
-    text: "Quand tu penses à la femme que tu étais avant d'être mère…",
-    options: [
-      { text: "Tu as l'impression qu'elle est loin, presque étrangère", score: [3, 0, 1] },
-      { text: "Tu lui manques, mais tu ne sais pas comment la retrouver", score: [2, 3, 0] },
-      { text: "Tu la vois clairement, tu sais ce que tu veux — mais tu n'oses pas le prendre", score: [0, 1, 3] },
-      { text: "Tu n'y penses pas vraiment, tu survoles sans t'arrêter", score: [1, 2, 1] }
-    ]
-  },
-  {
-    text: "Dans ton couple ou avec ton entourage, tu as tendance à…",
-    options: [
-      { text: "Taire ce que tu ressens pour ne pas bousculer l'équilibre", score: [2, 1, 3] },
-      { text: "Donner des signaux, mais sans aller jusqu'au bout de la conversation", score: [1, 3, 1] },
-      { text: "Te sentir incomprise quand tu essaies d'exprimer ton besoin de « plus »", score: [3, 0, 2] },
-      { text: "Tourner en rond sans jamais vraiment nommer ce qui ne va pas", score: [2, 2, 1] }
-    ]
-  },
-  {
-    text: "Quand tu imagines une vie qui te ressemble vraiment, tu…",
-    options: [
-      { text: "N'arrives pas encore à l'imaginer — c'est flou, voire impossible", score: [3, 1, 0] },
-      { text: "Vois des contours, mais tu doutes de mériter ou d'y avoir accès", score: [1, 3, 2] },
-      { text: "La vois très clairement — c'est juste le passage à l'acte qui coince", score: [0, 1, 3] },
-      { text: "Commences à la percevoir, mais tu as peur de l'erreur ou du changement", score: [2, 2, 2] }
-    ]
-  },
-  {
-    text: "La maternité, pour toi, c'est…",
-    options: [
-      { text: "Quelque chose qui t'a profondément changée, mais tu ne sais pas encore dans quel sens", score: [3, 1, 0] },
-      { text: "Une identité qui a pris toute la place, au détriment de la femme que tu es", score: [2, 3, 1] },
-      { text: "Une richesse ET une cage — tu veux les deux, mère et femme vivante", score: [0, 1, 3] },
-      { text: "Un bouleversement que tu n'as pas encore vraiment intégré", score: [2, 2, 1] }
-    ]
-  },
-  {
-    text: "Si tu pouvais changer une seule chose dans ta vie maintenant, ce serait…",
-    options: [
-      { text: "Comprendre enfin qui tu es devenue et ce que tu veux", score: [3, 0, 0] },
-      { text: "Avoir plus de clarté sur la direction à prendre", score: [0, 3, 0] },
-      { text: "Oser vraiment agir sur ce que tu sais déjà", score: [0, 0, 3] },
-      { text: "Sentir que tu existes en dehors de ton rôle de mère", score: [2, 1, 2] }
-    ]
-  }
+// ── CONFIG BREVO ─────────────────────────────────────────────
+var BREVO_KEY = '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';
+var BREVO_LISTS = { eveil: 10, chercheure: 11, audacieuse: 12 };
+
+// ── DATA ─────────────────────────────────────────────────────
+var Q = [
+  { t: "Le soir, quand les enfants sont couchés, tu ressens plutôt\u2026", o: [
+    { t: "Un vague malaise, une sensation que la journée est passée sans que tu y sois vraiment", s: [3,1,0] },
+    { t: "Du soulagement, et parfois une pensée furtive\u00a0: \u00ab\u00a0c\u2019est ça ma vie maintenant\u00a0?\u00a0\u00bb", s: [1,3,0] },
+    { t: "De l\u2019épuisement mais aussi une certaine culpabilité de ne pas être plus heureuse", s: [0,2,3] },
+    { t: "Un mélange d\u2019agacement et d\u2019envie d\u2019autre chose, sans savoir quoi exactement", s: [2,1,2] }
+  ]},
+  { t: "Face à tes désirs profonds (envie de changer de job, de voyager, de créer quelque chose\u2026), tu\u2026", o: [
+    { t: "Les tais. Tu les trouves inconvenants ou ingrats vu ta \u00ab\u00a0belle vie\u00a0\u00bb", s: [3,1,0] },
+    { t: "Les identifies mais tu ne sais pas par où commencer pour leur faire de la place", s: [1,3,0] },
+    { t: "Les exprimes à voix haute mais tu te sens bloquée par la peur de déranger", s: [0,2,3] },
+    { t: "Tu alternes entre enthousiasme et paralysie", s: [2,2,1] }
+  ]},
+  { t: "Quand tu penses à la femme que tu étais avant d\u2019être mère\u2026", o: [
+    { t: "Tu as l\u2019impression qu\u2019elle est loin, presque étrangère", s: [3,0,1] },
+    { t: "Tu lui manques, mais tu ne sais pas comment la retrouver", s: [2,3,0] },
+    { t: "Tu la vois clairement, tu sais ce que tu veux \u2014 mais tu n\u2019oses pas le prendre", s: [0,1,3] },
+    { t: "Tu n\u2019y penses pas vraiment, tu survoles sans t\u2019arrêter", s: [1,2,1] }
+  ]},
+  { t: "Dans ton couple ou avec ton entourage, tu as tendance à\u2026", o: [
+    { t: "Taire ce que tu ressens pour ne pas bousculer l\u2019équilibre", s: [2,1,3] },
+    { t: "Donner des signaux, mais sans aller jusqu\u2019au bout de la conversation", s: [1,3,1] },
+    { t: "Te sentir incomprise quand tu essaies d\u2019exprimer ton besoin de \u00ab\u00a0plus\u00a0\u00bb", s: [3,0,2] },
+    { t: "Tourner en rond sans jamais vraiment nommer ce qui ne va pas", s: [2,2,1] }
+  ]},
+  { t: "Quand tu imagines une vie qui te ressemble vraiment, tu\u2026", o: [
+    { t: "N\u2019arrives pas encore à l\u2019imaginer \u2014 c\u2019est flou, voire impossible", s: [3,1,0] },
+    { t: "Vois des contours, mais tu doutes de mériter ou d\u2019y avoir accès", s: [1,3,2] },
+    { t: "La vois très clairement \u2014 c\u2019est juste le passage à l\u2019acte qui coince", s: [0,1,3] },
+    { t: "Commences à la percevoir, mais tu as peur de l\u2019erreur ou du changement", s: [2,2,2] }
+  ]},
+  { t: "La maternité, pour toi, c\u2019est\u2026", o: [
+    { t: "Quelque chose qui t\u2019a profondément changée, mais tu ne sais pas encore dans quel sens", s: [3,1,0] },
+    { t: "Une identité qui a pris toute la place, au détriment de la femme que tu es", s: [2,3,1] },
+    { t: "Une richesse ET une cage \u2014 tu veux les deux, mère et femme vivante", s: [0,1,3] },
+    { t: "Un bouleversement que tu n\u2019as pas encore vraiment intégré", s: [2,2,1] }
+  ]},
+  { t: "Si tu pouvais changer une seule chose dans ta vie maintenant, ce serait\u2026", o: [
+    { t: "Comprendre enfin qui tu es devenue et ce que tu veux", s: [3,0,0] },
+    { t: "Avoir plus de clarté sur la direction à prendre", s: [0,3,0] },
+    { t: "Oser vraiment agir sur ce que tu sais déjà", s: [0,0,3] },
+    { t: "Sentir que tu existes en dehors de ton rôle de mère", s: [2,1,2] }
+  ]}
 ];
 
-const profiles = [
-  {
-    id: 'eveil',
-    name: "L'Éveillée",
-    subtitle: "Tu sens que quelque chose commence",
-    tagline: "La mutation est en toi — tu commences à l'entendre.",
-    badge: "Profil Éveil",
-    description: `Tu es au tout début de ton shift identitaire. Quelque chose remue en toi, une voix douce mais persistante qui dit que ta vie pourrait être différente. Tu ne sais pas encore ce que tu veux vraiment, ni qui tu es en train de devenir. Et c'est exactement là que tout commence.\n\nCe que tu vis n'est pas du caprice : c'est le premier mouvement d'une transformation profonde. Ta prochaine étape, c'est d'abord d'apprendre à entendre cette voix sans l'étouffer.`,
-    signes: [
-      "Tu te sens parfois à côté de ta propre vie sans pouvoir nommer pourquoi",
-      "Tu tais tes désirs, souvent sans même t'en rendre compte",
-      "L'image de la femme que tu étais avant semble lointaine ou floue",
-      "Tu cherches des mots pour ce que tu ressens, mais ils ne viennent pas encore"
-    ],
-    prochaines: [
-      "Commencer à nommer ce que tu ressens, même imparfaitement",
-      "T'autoriser à vouloir sans te justifier",
-      "Explorer ce qui t'animait avant la maternité",
-      "Rejoindre un espace où ce que tu vis a un nom"
-    ]
-  },
-  {
-    id: 'chercheure',
-    name: "La Chercheuse",
-    subtitle: "Tu sais ce qui ne va plus, mais pas encore où aller",
-    tagline: "Tu vois le chemin — mais tu cherches la carte.",
-    badge: "Profil Transition",
-    description: `Tu as conscience du shift que tu traverses. Tu sais que ta vie ne te ressemble plus vraiment. Tu identifies tes désirs mais quelque chose freine encore le passage à l'action : le doute, la culpabilité, la peur de déranger.\n\nTu es dans cette zone inconfortable entre l'ancienne version de toi et la nouvelle. C'est souvent là que les femmes restent coincées le plus longtemps — parce qu'elles voient où aller mais ne s'autorisent pas encore à vraiment y aller.`,
-    signes: [
-      "Tu sais que tu veux « plus » mais tu te sens ingrate de l'admettre",
-      "Tu starts des choses (sport, routine, projets) mais rien ne tient",
-      "Tu envoies des signaux à ton entourage sans aller jusqu'à la vraie conversation",
-      "La clarté est là parfois, puis elle s'efface"
-    ],
-    prochaines: [
-      "Travailler sur la permission intérieure — t'autoriser à vouloir",
-      "Identifier les loyautés invisibles qui te retiennent",
-      "Nommer clairement tes désirs, même les plus « fous »",
-      "Créer un espace pour toi en dehors de ton rôle de mère"
-    ]
-  },
-  {
-    id: 'audacieuse',
-    name: "L'Audacieuse en devenir",
-    subtitle: "Tu vois, tu sais — il ne reste qu'à oser",
-    tagline: "Tu es prête. Ce qui manque, c'est le premier pas.",
-    badge: "Profil Action",
-    description: `Tu es au stade le plus proche du basculement. Tu sais qui tu veux être. Tu vois la vie que tu veux construire. Mais quelque chose bloque encore le passage à l'acte : la peur de faire exploser ce que tu as, de ne plus être aimée, de te tromper.\n\nTu as toutes les ressources en toi. Ce qu'il te faut, c'est un espace pour les libérer — des outils concrets, des actions incarnées, et un accompagnement pour avancer sans tout faire exploser.`,
-    signes: [
-      "Tu sais exactement ce que tu veux mais tu ne l'as pas encore dit clairement",
-      "Tu as peur que ta transformation bouscule ton couple ou ta famille",
-      "Tu as tendance à te sur-adapter pour ne pas déranger",
-      "L'impatience monte : tu sens que le temps passe"
-    ],
-    prochaines: [
-      "Avoir les conversations courageuses que tu repousses",
-      "Poser des actions concrètes, même imparfaites, maintenant",
-      "Travailler l'affirmation sans te diminuer",
-      "Rejoindre un collectif de femmes qui comprennent ce que tu vis"
-    ]
-  }
+var P = [
+  { id:'eveil', badge:"Profil Éveil", name:"L\u2019Éveillée", subtitle:"Tu sens que quelque chose commence",
+    desc:"Tu es au tout début de ton shift identitaire. Quelque chose remue en toi, une voix douce mais persistante qui dit que ta vie pourrait être différente.\n\nCe que tu vis n\u2019est pas du caprice\u00a0: c\u2019est le premier mouvement d\u2019une transformation profonde.",
+    signes:["Tu te sens parfois à côté de ta propre vie sans pouvoir nommer pourquoi","Tu tais tes désirs, souvent sans même t\u2019en rendre compte","L\u2019image de la femme que tu étais avant semble lointaine ou floue","Tu cherches des mots pour ce que tu ressens, mais ils ne viennent pas encore"],
+    prochaines:["Commencer à nommer ce que tu ressens, même imparfaitement","T\u2019autoriser à vouloir sans te justifier","Explorer ce qui t\u2019animait avant la maternité","Rejoindre un espace où ce que tu vis a un nom"] },
+  { id:'chercheure', badge:"Profil Transition", name:"La Chercheuse", subtitle:"Tu sais ce qui ne va plus, mais pas encore où aller",
+    desc:"Tu as conscience du shift que tu traverses. Tu sais que ta vie ne te ressemble plus vraiment. Mais quelque chose freine encore le passage à l\u2019action\u00a0: le doute, la culpabilité, la peur de déranger.\n\nTu es dans cette zone inconfortable entre l\u2019ancienne toi et la nouvelle.",
+    signes:["Tu sais que tu veux \u00ab\u00a0plus\u00a0\u00bb mais tu te sens ingrate de l\u2019admettre","Tu testes des choses mais rien ne tient sur la durée","Tu envoies des signaux sans aller jusqu\u2019à la vraie conversation","La clarté est là parfois, puis elle s\u2019efface"],
+    prochaines:["Travailler sur la permission intérieure \u2014 t\u2019autoriser à vouloir","Identifier les loyautés invisibles qui te retiennent","Nommer clairement tes désirs, même les plus grands","Créer un espace pour toi en dehors de ton rôle de mère"] },
+  { id:'audacieuse', badge:"Profil Action", name:"L\u2019Audacieuse en devenir", subtitle:"Tu vois, tu sais \u2014 il ne reste qu\u2019à oser",
+    desc:"Tu es au stade le plus proche du basculement. Tu sais qui tu veux être. Tu vois la vie que tu veux construire. Mais quelque chose bloque encore\u00a0: la peur de faire exploser ce que tu as.\n\nTu as toutes les ressources en toi. Ce qu\u2019il te faut, c\u2019est un espace pour les libérer.",
+    signes:["Tu sais exactement ce que tu veux mais tu ne l\u2019as pas encore dit clairement","Tu as peur que ta transformation bouscule ton couple ou ta famille","Tu as tendance à te sur-adapter pour ne pas déranger","L\u2019impatience monte\u00a0: tu sens que le temps passe"],
+    prochaines:["Avoir les conversations courageuses que tu repousses","Poser des actions concrètes, même imparfaites, maintenant","Travailler l\u2019affirmation sans te diminuer","Rejoindre un collectif de femmes qui comprennent ce que tu vis"] }
 ];
 
-let currentQ = 0;
-let answers = new Array(questions.length).fill(null);
+// ── STATE ────────────────────────────────────────────────────
+var cur = 0;
+var ans = new Array(Q.length).fill(null);
 
-function startQuiz() {
-  document.getElementById('screen-start').classList.add('hidden');
-  document.getElementById('screen-quiz').classList.remove('hidden');
-  renderQuestion();
+// ── HELPERS ──────────────────────────────────────────────────
+function show(id) {
+  document.querySelectorAll('.screen').forEach(function(s){ s.classList.remove('active'); });
+  document.getElementById(id).classList.add('active');
+  window.scrollTo(0,0);
+  setTimeout(notifyHeight, 150);
+}
+function notifyHeight() {
+  try { window.parent.postMessage({type:'quizHeight', height: document.body.scrollHeight}, '*'); } catch(e){}
 }
 
-function renderQuestion() {
-  const q = questions[currentQ];
-  const container = document.getElementById('question-container');
-  const selectedVal = answers[currentQ];
+// ── RENDER ───────────────────────────────────────────────────
+function render() {
+  var q = Q[cur];
+  document.getElementById('question-number').textContent = 'Question ' + (cur+1) + ' sur ' + Q.length;
+  document.getElementById('question-text').textContent = q.t;
+  document.getElementById('progress-count').textContent = (cur+1) + ' / ' + Q.length;
+  document.getElementById('progress-fill').style.width = (((cur+1)/Q.length)*100) + '%';
 
-  const optionsHtml = q.options.map((opt, i) => `
-    <button class="option ${selectedVal === i ? 'selected' : ''}" data-index="${i}">
-      <span class="option-dot"></span>
-      <span class="option-text">${opt.text}</span>
-    </button>
-  `).join('');
-
-  container.innerHTML = `
-    <div class="question-card">
-      <div class="question-number">Question ${currentQ + 1} sur ${questions.length}</div>
-      <div class="question-text">${q.text}</div>
-      <div class="options">${optionsHtml}</div>
-    </div>
-  `;
-
-  document.getElementById('progress-count').textContent = `${currentQ + 1} / ${questions.length}`;
-  document.getElementById('progress-fill').style.width = `${((currentQ + 1) / questions.length) * 100}%`;
-  document.getElementById('btn-back').style.visibility = currentQ === 0 ? 'hidden' : 'visible';
-  document.getElementById('btn-next').disabled = selectedVal === null;
-  document.getElementById('btn-next').textContent = currentQ === questions.length - 1 ? 'Voir mes résultats →' : 'Continuer →';
-}
-
-function selectOption(i) {
-  answers[currentQ] = i;
-  renderQuestion();
-}
-
-function nextQuestion() {
-  if (answers[currentQ] === null) return;
-  if (currentQ < questions.length - 1) {
-    currentQ++;
-    renderQuestion();
-  } else {
-    document.getElementById('screen-quiz').classList.add('hidden');
-    document.getElementById('screen-email').classList.remove('hidden');
-  }
-}
-
-function prevQuestion() {
-  if (currentQ > 0) {
-    currentQ--;
-    renderQuestion();
-  }
-}
-
-function computeProfile() {
-  const scores = [0, 0, 0];
-  answers.forEach((answerIdx, qIdx) => {
-    if (answerIdx !== null) {
-      const s = questions[qIdx].options[answerIdx].score;
-      scores[0] += s[0];
-      scores[1] += s[1];
-      scores[2] += s[2];
-    }
+  var c = document.getElementById('options-container');
+  c.innerHTML = '';
+  q.o.forEach(function(opt, i) {
+    var b = document.createElement('button');
+    b.className = 'option' + (ans[cur]===i ? ' selected' : '');
+    b.dataset.i = i;
+    b.innerHTML = '<span class="option-dot"></span><span class="option-text">' + opt.t + '</span>';
+    c.appendChild(b);
   });
-  const maxIdx = scores.indexOf(Math.max(...scores));
-  return profiles[maxIdx];
+
+  document.getElementById('btn-back').classList.toggle('invisible', cur===0);
+  document.getElementById('btn-next').disabled = ans[cur]===null;
+  document.getElementById('btn-next').textContent = cur===Q.length-1 ? 'Voir mes résultats →' : 'Continuer →';
 }
 
-// ============================================================
-//  CONFIGURATION BREVO
-//
-//  Étape 1 — Clé API :
-//    Brevo → ton avatar → Paramètres SMTP & API → API Keys
-//    → Générer une nouvelle clé API → colle-la ici
-//
-//  Étape 2 — IDs de liste :
-//    Brevo → Contacts → Listes → crée 3 listes (une par profil)
-//    → l'ID est visible dans l'URL quand tu ouvres la liste
-//    → ex : brevo.com/contacts/lists/12  →  ID = 12
-//
-//  Étape 3 — IDs d'automation (optionnel mais recommandé) :
-//    Brevo → Automations → crée une automation par profil
-//    (déclencheur : "contact ajouté à la liste X") qui envoie le PDF
-//    → pas besoin d'ID ici, l'automation se déclenche automatiquement
-//    quand le contact est ajouté à la bonne liste
-// ============================================================
-const BREVO_API_KEY = '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';
+// ── ACTIONS ──────────────────────────────────────────────────
+function startQuiz() { show('screen-quiz'); render(); }
 
-const BREVO_LIST_IDS = {
-  eveil:      10,   // ← remplace 0 par l'ID de ta liste "Profil Éveil"
-  chercheure: 11,   // ← remplace 0 par l'ID de ta liste "Profil Chercheuse"
-  audacieuse: 12    // ← remplace 0 par l'ID de ta liste "Profil Audacieuse"
-};
-// ============================================================
+function pick(i) {
+  ans[cur] = i;
+  document.querySelectorAll('#options-container .option').forEach(function(b,j){ b.classList.toggle('selected', j===i); });
+  document.getElementById('btn-next').disabled = false;
+}
 
-function updateSubmitBtn() {
-  const checked = document.getElementById('rgpd-checkbox').checked;
-  document.getElementById('btn-submit').disabled = !checked;
+function next() {
+  if (ans[cur]===null) return;
+  if (cur < Q.length-1) { cur++; render(); }
+  else { show('screen-email'); }
+}
+
+function back() { if (cur>0) { cur--; render(); } }
+
+function toggleRgpd() {
+  var checked = document.getElementById('rgpd-checkbox').checked;
   document.getElementById('rgpd-label').classList.toggle('checked', checked);
+  document.getElementById('btn-submit').disabled = !checked;
 }
 
-async function sendToBrevo(name, email, profileId) {
-  if (BREVO_API_KEY === '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') {
-    console.warn('[Brevo] API key non configurée — contact non enregistré.');
-    return;
-  }
-
-  const listId = BREVO_LIST_IDS[profileId];
-  if (!listId) {
-    console.warn('[Brevo] ID de liste non configuré pour le profil :', profileId);
-    return;
-  }
-
-  try {
-    // Créer ou mettre à jour le contact
-    // Si le contact existe déjà, Brevo le met à jour sans erreur (upsert)
-    const res = await fetch('https://api.brevo.com/v3/contacts', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'api-key': BREVO_API_KEY
-      },
-      body: JSON.stringify({
-        email: email,
-        // Attributs du contact (doivent exister dans Brevo → Contacts → Attributs)
-        attributes: {
-          PRENOM:            name !== 'toi' ? name : undefined,
-          PROFIL_QUIZ:       profileId,               // ex : "eveil"
-          RGPD_CONSENT:      true,
-          RGPD_DATE:         new Date().toISOString(), // horodatage du consentement
-          RGPD_SOURCE:       'quiz-shift-identitaire'
-        },
-        // Ajouter dans la liste correspondant au profil
-        // → déclenche automatiquement l'automation Brevo associée
-        listIds: [listId],
-        // Double opt-in désactivé : le consentement est explicite via la case RGPD
-        updateEnabled: true  // met à jour le contact s'il existe déjà
-      })
-    });
-
-    if (res.status === 201) {
-      console.log('[Brevo] ✓ Contact créé et ajouté à la liste', listId);
-    } else if (res.status === 204) {
-      console.log('[Brevo] ✓ Contact mis à jour, ajout à la liste', listId);
-    } else {
-      const err = await res.json();
-      console.error('[Brevo] Erreur :', res.status, err);
-    }
-
-  } catch (e) {
-    // Erreur réseau — on n'empêche pas l'affichage du résultat
-    console.error('[Brevo] Erreur réseau :', e);
-  }
-}
-
-async function showResult() {
-  const name = document.getElementById('input-name').value.trim() || 'toi';
-  const email = document.getElementById('input-email').value.trim();
-  const rgpd = document.getElementById('rgpd-checkbox').checked;
-
+function submit() {
+  var email = document.getElementById('input-email').value.trim();
+  var name  = document.getElementById('input-name').value.trim();
   if (!email) { alert('Entre ton email pour voir ton résultat 💌'); return; }
-  if (!rgpd)  { alert('Coche la case de consentement pour continuer.'); return; }
+  if (!document.getElementById('rgpd-checkbox').checked) { alert('Coche la case de consentement.'); return; }
 
-  const profile = computeProfile();
+  var sc = [0,0,0];
+  ans.forEach(function(a,qi){ if(a!==null){ var s=Q[qi].o[a].s; sc[0]+=s[0]; sc[1]+=s[1]; sc[2]+=s[2]; } });
+  var pi = sc[1]>sc[0] ? 1 : 0; if (sc[2]>sc[pi]) pi=2;
+  var p = P[pi];
 
-  // Affichage immédiat — sans attendre la réponse API
-  document.getElementById('screen-email').classList.add('hidden');
-  const resultEl = document.getElementById('screen-result');
-  resultEl.classList.remove('hidden');
+  var greet = name ? (name + ', tu es ') : 'Tu es ';
+  document.getElementById('result-hero').innerHTML =
+    '<div class="profile-badge">'+p.badge+'</div>'+
+    '<h2>'+greet+'<em>'+p.name+'</em></h2>'+
+    '<p class="result-tagline">'+p.subtitle+'</p>'+
+    '<div class="result-divider"></div>'+
+    '<div class="result-desc">'+p.desc.split('\n\n').map(function(x){return'<p>'+x+'</p>';}).join('')+'</div>';
 
-  const signesHtml = profile.signes.map(s => `<li>${s}</li>`).join('');
-  const prochHtml  = profile.prochaines.map(p => `<li>${p}</li>`).join('');
-  const descParagraphs = profile.description.split('\n\n').map(p => `<p>${p}</p>`).join('');
+  document.getElementById('result-signes').innerHTML =
+    '<h3>🪞 Ce que tu vis en ce moment</h3><ul>'+
+    p.signes.map(function(x){return'<li>'+x+'</li>';}).join('')+'</ul>';
 
-  resultEl.innerHTML = `
-    <div class="result-hero">
-      <div class="result-profile-badge">${profile.badge}</div>
-      <h2>${name !== 'toi' ? name + ', tu es ' : 'Tu es '}<em>${profile.name}</em></h2>
-      <p class="result-tagline">${profile.subtitle}</p>
-      <div class="result-divider"></div>
-      <div class="result-description">${descParagraphs}</div>
-    </div>
+  document.getElementById('result-prochaines').innerHTML =
+    '<h3>🔥 Tes prochaines étapes</h3><ul>'+
+    p.prochaines.map(function(x){return'<li>'+x+'</li>';}).join('')+'</ul>';
 
-    <div class="result-section">
-      <h3>🪞 Ce que tu vis en ce moment</h3>
-      <ul>${signesHtml}</ul>
-    </div>
+  document.getElementById('confirm-msg').textContent =
+    '📩 Ton PDF est en route vers '+email+' — vérifie tes spams si besoin.';
 
-    <div class="result-section">
-      <h3>🔥 Tes prochaines étapes</h3>
-      <ul>${prochHtml}</ul>
-    </div>
+  show('screen-result');
 
-    <div class="cta-box">
-      <h3>Prête à passer au niveau suivant ?</h3>
-      <p>Le coaching collectif <strong>CRÉE TA VIE</strong> commence le 4 mai. 4 mois pour incarner ta nouvelle identité post-maternité — sans tout faire exploser.</p>
-      <a href="https://clementinedoula.com/accompagnements/coaching-signature-cree-ta-vie/" class="btn-cta" target="_blank">
-        Découvrir CRÉE TA VIE →
-      </a>
-    </div>
-
-    <div style="text-align:center; margin-top: 16px;">
-      <p style="font-size: 13px; color: var(--muted);">📩 Ton PDF est en route vers <strong>${email}</strong> — vérifie tes spams si tu ne le reçois pas dans 5 min.</p>
-    </div>
-  `;
-
-  resultEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
-
-  // Envoi en arrière-plan vers Brevo (non bloquant)
-  sendToBrevo(name, email, profile.id);
+  // Brevo (non-blocking)
+  var lid = BREVO_LISTS[p.id];
+  if (lid) {
+    var payload = { email:email, attributes:{ PROFIL_QUIZ:p.id, RGPD_CONSENT:true, RGPD_DATE:new Date().toISOString(), RGPD_SOURCE:'quiz-shift' }, listIds:[lid], updateEnabled:true };
+    if (name) payload.attributes.PRENOM = name;
+    fetch('https://api.brevo.com/v3/contacts', { method:'POST', headers:{'Content-Type':'application/json','api-key':BREVO_KEY}, body:JSON.stringify(payload) })
+      .then(function(r){ console.log('[Brevo]',r.status); })
+      .catch(function(e){ console.warn('[Brevo]',e); });
+  }
 }
+
+// ── BIND EVENTS (window.onload — DOM garantit prêt) ──────────
+window.onload = function() {
+  document.getElementById('btn-start').onclick   = startQuiz;
+  document.getElementById('btn-back').onclick    = back;
+  document.getElementById('btn-next').onclick    = next;
+  document.getElementById('btn-submit').onclick  = submit;
+  document.getElementById('rgpd-checkbox').onchange = toggleRgpd;
+
+  // Options via délégation sur le conteneur
+  document.getElementById('options-container').onclick = function(e) {
+    var el = e.target;
+    while (el && el !== this) {
+      if (el.classList.contains('option')) { pick(parseInt(el.dataset.i)); return; }
+      el = el.parentElement;
+    }
+  };
+
+  // iFrame resize
+  try { new ResizeObserver(notifyHeight).observe(document.body); } catch(e){}
+};
 </script>
-
-
-<script>
-// ── iFrame height reporter ───────────────────────────────────────────────────
-function reportHeight() {
-  var h = Math.max(document.body.scrollHeight, document.documentElement.scrollHeight);
-  try { window.parent.postMessage({ type: 'quizHeight', height: h }, '*'); } catch(e) {}
-}
-new ResizeObserver(reportHeight).observe(document.body);
-window.addEventListener('load', reportHeight);
-</script>
-
-<script>
-// ── Master event dispatcher ───────────────────────────────────────────────────
-// Single delegated listener on document — survives any innerHTML rewrite.
-// Buttons are identified by id or class, not by onclick.
-document.addEventListener('click', function(e) {
-  var t = e.target;
-
-  // Walk up max 3 levels to find a clickable element
-  // (handles clicks on child spans inside buttons)
-  for (var i = 0; i < 3; i++) {
-    if (!t || t === document) break;
-
-    // START button
-    if (t.classList && t.classList.contains('btn-start')) {
-      e.preventDefault();
-      startQuiz();
-      return;
-    }
-    // BACK button
-    if (t.id === 'btn-back') {
-      e.preventDefault();
-      prevQuestion();
-      return;
-    }
-    // NEXT / SUBMIT QUIZ button
-    if (t.id === 'btn-next') {
-      e.preventDefault();
-      nextQuestion();
-      return;
-    }
-    // SUBMIT EMAIL button
-    if (t.id === 'btn-submit') {
-      e.preventDefault();
-      showResult();
-      return;
-    }
-    // OPTION buttons (data-index set in renderQuestion)
-    if (t.hasAttribute && t.hasAttribute('data-index')) {
-      e.preventDefault();
-      selectOption(parseInt(t.getAttribute('data-index')));
-      return;
-    }
-
-    t = t.parentElement;
-  }
-});
-
-// RGPD checkbox — change event
-document.addEventListener('change', function(e) {
-  if (e.target && e.target.id === 'rgpd-checkbox') {
-    updateSubmitBtn();
-  }
-});
-
-// Remove loading indicator when DOM is ready
-(function() {
-  function removeDebug() {
-    var dbg = document.getElementById('quiz-debug');
-    if (dbg) dbg.remove();
-  }
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', removeDebug);
-  } else {
-    removeDebug();
-  }
-})();
-</script>
-
 </body>
 </html>
